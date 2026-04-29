@@ -65,14 +65,3 @@ app.listen(PORT, () => {
   console.log(`📡 API available at: http://localhost:${PORT}\n`);
 });
 
-const User = require("./models/User");
-const Product = require("./models/Product");
-const Category = require("./models/Category");
-const Order = require("./models/Order");
-console.log(
-  "✅ All models loaded:",
-  User.modelName,
-  Product.modelName,
-  Category.modelName,
-  Order.modelName,
-);
