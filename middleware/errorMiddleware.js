@@ -1,34 +1,27 @@
-// middleware/errorMiddleware.js
 
-// ─── 404 Handler ──────────────────────────────────────────────────────────────
 const notFound = (req, res, next) => {
   const error = new Error(`Route not found: ${req.originalUrl}`);
   res.status(404);
   next(error);
 };
 
-// ─── Global Error Handler ─────────────────────────────────────────────────────
 const errorHandler = (err, req, res, next) => {
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
 
-  // ── Mongoose: Bad ObjectId ──
-  // e.g. /api/products/notanid → "Cast to ObjectId failed"
+
   if (err.name === "CastError" && err.kind === "ObjectId") {
     statusCode = 404;
     message = "Resource not found — invalid ID format";
   }
 
-  // ── Mongoose: Duplicate Key ──
-  // e.g. registering with an email that already exists
   if (err.code === 11000) {
     statusCode = 400;
     const field = Object.keys(err.keyValue)[0];
     message = `${field} already exists — please use a different value`;
   }
 
-  // ── Mongoose: Validation Error ──
-  // e.g. missing required field
+
   if (err.name === "ValidationError") {
     statusCode = 400;
     message = Object.values(err.errors)
@@ -36,13 +29,11 @@ const errorHandler = (err, req, res, next) => {
       .join(", ");
   }
 
-  // ── JWT: Invalid Token ──
   if (err.name === "JsonWebTokenError") {
     statusCode = 401;
     message = "Invalid token — please log in again";
   }
 
-  // ── JWT: Expired Token ──
   if (err.name === "TokenExpiredError") {
     statusCode = 401;
     message = "Token expired — please log in again";
